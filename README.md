@@ -90,4 +90,4 @@ The UI for management uses high-end, dynamic Tailwind components featuring:
    The `Program.cs` automatically seeds an Admin user upon startup (check `AdminSettings` in your `appsettings.json` for credentials). Log in with those details to access the Management dashboard!
 
 ---
-*Built with ❤️ for the GDG Community.*
+*Built for the GDG Assiut Community.*
