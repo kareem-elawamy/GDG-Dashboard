@@ -7,6 +7,7 @@ namespace GDG_DashBoard.DAL.Models
 {
     public class ApplicationUser : IdentityUser<Guid>
     {
+        [System.ComponentModel.DataAnnotations.MaxLength(250)]
         public string? Season { get; set; }
         public bool IsActive { get; set; } = true;
 

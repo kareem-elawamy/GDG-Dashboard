@@ -14,6 +14,34 @@ public class RoadmapService : IRoadmapService
         _context = context;
     }
 
+    public async Task<List<Roadmap>> GetAllRoadmapsAsync()
+    {
+        return await _context.Roadmaps
+            .Include(r => r.CreatedBy)
+            .Include(r => r.Levels)
+            .ToListAsync();
+    }
+
+    public async Task<List<Roadmap>> GetPublicRoadmapsAsync(int count = 12)
+    {
+        return await _context.Roadmaps
+            .Include(r => r.CreatedBy)
+            .Include(r => r.Levels)
+            .Include(r => r.Enrollments)
+            .OrderByDescending(r => r.CreatedAt)
+            .Take(count)
+            .ToListAsync();
+    }
+
+    public async Task<List<Roadmap>> GetRoadmapsByCreatorAsync(Guid userId)
+    {
+        return await _context.Roadmaps
+            .Include(r => r.CreatedBy)
+            .Include(r => r.Levels)
+            .Where(r => r.CreatedByUserId == userId)
+            .ToListAsync();
+    }
+
     public async Task<Roadmap?> GetRoadmapDetailsAsync(Guid roadmapId)
     {
         return await _context.Roadmaps

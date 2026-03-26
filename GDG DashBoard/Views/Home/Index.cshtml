@@ -1,41 +1,159 @@
 @{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Discover";
     Layout = "_AdminLayout";
-    ViewData["PageTitle"] = "Home";
+    ViewData["PageTitle"] = "Discover";
+
+    var roadmaps = ViewBag.Roadmaps as List<GDG_DashBoard.DAL.Models.Roadmap> ?? new();
+    var groups = ViewBag.Groups as List<GDG_DashBoard.DAL.Models.CommunityGroup> ?? new();
 }
 
-<div class="max-w-4xl mx-auto space-y-8 mt-8">
-    <div class="bg-white rounded-2xl border border-outline-variant shadow-sm p-12 text-center">
-        <img src="~/image/gdg_bandung_logo_only.png.png" asp-append-version="true" alt="GDG Logo" class="w-24 h-auto mx-auto mb-6" onerror="this.onerror=null; this.src='https://via.placeholder.com/96x96?text=G';" />
-        
-        <h1 class="text-4xl font-bold font-headline text-on-surface mb-3">Welcome to GDG Dashboard</h1>
-        <p class="text-on-surface/60 max-w-xl mx-auto text-lg">
-            A unified learning, management, and progress-tracking platform for Google Developer Groups.
-        </p>
+<div class="max-w-7xl mx-auto space-y-14 px-4 py-8 sm:px-6 lg:px-8">
 
-        <div class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-4 max-w-2xl mx-auto">
-            <a asp-controller="Member" asp-action="Index" class="group flex items-center p-4 bg-surface-container-low border border-outline-variant hover:border-primary/30 rounded-xl transition-all">
-                <div class="w-12 h-12 rounded-lg bg-gdg-blue/10 flex items-center justify-center mr-4 group-hover:bg-gdg-blue/20 transition-colors">
-                    <span class="material-symbols-outlined text-gdg-blue">person</span>
-                </div>
-                <div class="text-left hidden md:block">
-                    <h3 class="font-bold text-sm text-on-surface">My Profile</h3>
-                    <p class="text-xs text-on-surface/50">Manage your CV and skills</p>
-                </div>
-            </a>
-
-            @if (User.IsInRole("Admin"))
-            {
-                <a asp-controller="Admin" asp-action="Index" class="group flex items-center p-4 bg-surface-container-low border border-outline-variant hover:border-gdg-red/30 rounded-xl transition-all">
-                    <div class="w-12 h-12 rounded-lg bg-gdg-red/10 flex items-center justify-center mr-4 group-hover:bg-gdg-red/20 transition-colors">
-                        <span class="material-symbols-outlined text-gdg-red">dashboard</span>
-                    </div>
-                    <div class="text-left hidden md:block">
-                        <h3 class="font-bold text-sm text-on-surface">Admin Dashboard</h3>
-                        <p class="text-xs text-on-surface/50">Platform management</p>
-                    </div>
+    <!-- ══ HERO ═══════════════════════════════════════════════════════ -->
+    <section class="relative bg-gradient-to-br from-[#eef3ff] via-white to-[#e8f5e9] rounded-[2rem] p-10 md:p-16 overflow-hidden border border-outline-variant/8">
+        <div class="absolute -top-20 -right-20 w-80 h-80 bg-primary/5 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="absolute -bottom-16 -left-16 w-56 h-56 bg-secondary/8 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="relative z-10 max-w-2xl">
+            <span class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 text-primary text-[11px] font-black tracking-wider uppercase mb-5">
+                <span class="material-symbols-outlined text-sm" style="font-variation-settings:'FILL' 1;">explore</span> Discovery Hub
+            </span>
+            <h1 class="text-4xl md:text-5xl font-extrabold tracking-tight font-headline text-on-surface leading-[1.1]">
+                Level Up Your<br/>
+                <span class="bg-gradient-to-r from-primary via-[#8ab4f8] to-secondary bg-clip-text text-transparent">Developer Journey</span>
+            </h1>
+            <p class="text-on-surface/50 text-lg mt-5 max-w-lg font-medium leading-relaxed">
+                Explore curated learning tracks, join mentored cohorts, and track your progress within the GDG ecosystem.
+            </p>
+            <div class="flex flex-wrap gap-3 mt-8">
+                <a href="#tracks" class="px-7 py-3.5 bg-primary text-white rounded-2xl font-bold text-sm hover:bg-primary/90 transition-all shadow-xl shadow-primary/15 active:scale-[0.97] flex items-center gap-2">
+                    <span class="material-symbols-outlined text-lg text-white">school</span> Explore Tracks
                 </a>
-            }
+                <a href="#cohorts" class="px-7 py-3.5 bg-white text-on-surface rounded-2xl font-bold text-sm border border-outline-variant/20 hover:border-primary/25 hover:shadow-md transition-all active:scale-[0.97] flex items-center gap-2">
+                    <span class="material-symbols-outlined text-lg">groups</span> Join a Cohort
+                </a>
+            </div>
         </div>
-    </div>
+    </section>
+
+    <!-- ══ EXPLORE LEARNING TRACKS ════════════════════════════════════ -->
+    <section id="tracks" class="space-y-8">
+        <div class="flex items-center gap-3">
+            <div class="w-11 h-11 rounded-2xl bg-primary/10 flex items-center justify-center">
+                <span class="material-symbols-outlined text-primary" style="font-variation-settings:'FILL' 1;">route</span>
+            </div>
+            <div>
+                <h2 class="text-2xl font-bold font-headline tracking-tight">Explore Learning Tracks</h2>
+                <p class="text-sm text-on-surface/40 font-medium">Curated roadmaps designed by community experts</p>
+            </div>
+        </div>
+
+        @if (roadmaps.Any())
+        {
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                @{ string[] accents = { "from-primary to-[#8ab4f8]", "from-secondary to-[#81c995]", "from-tertiary to-[#fdd663]", "from-error to-[#f28b82]" }; }
+                @{ string[] badgeColors = { "bg-primary/8 text-primary", "bg-secondary/8 text-secondary", "bg-tertiary/8 text-tertiary", "bg-error/8 text-error" }; }
+                @for (int i = 0; i < roadmaps.Count; i++)
+                {
+                    var rm = roadmaps[i];
+                    var accent = accents[i % accents.Length];
+                    var badge = badgeColors[i % badgeColors.Length];
+
+                    <a asp-controller="Member" asp-action="RoadmapDetails" asp-route-id="@rm.Id"
+                       class="group bg-white rounded-3xl overflow-hidden border border-outline-variant/10 hover:shadow-2xl hover:-translate-y-1.5 transition-all duration-300 flex flex-col cursor-pointer">
+                        <!-- Gradient strip -->
+                        <div class="h-1.5 bg-gradient-to-r @accent"></div>
+                        <div class="p-7 flex flex-col flex-1">
+                            <div class="flex items-start justify-between mb-4">
+                                <span class="px-3 py-1 rounded-xl text-[10px] font-black uppercase tracking-widest @badge">@rm.Level</span>
+                                <span class="text-xs font-bold text-on-surface/30 flex items-center gap-1">
+                                    <span class="material-symbols-outlined text-sm">layers</span> @rm.Levels.Count
+                                </span>
+                            </div>
+                            <h3 class="text-lg font-bold font-headline text-on-surface mb-2 group-hover:text-primary transition-colors leading-snug">@rm.Title</h3>
+                            @if (!string.IsNullOrEmpty(rm.Description))
+                            {
+                                <p class="text-sm text-on-surface/45 leading-relaxed flex-1 line-clamp-2">@rm.Description</p>
+                            }
+                            <div class="flex items-center justify-between mt-5 pt-4 border-t border-outline-variant/8">
+                                <div class="flex items-center gap-4 text-xs text-on-surface/40 font-medium">
+                                    <span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm">schedule</span> @rm.EstimatedTotalHours hrs</span>
+                                    <span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm">people</span> @rm.Enrollments.Count</span>
+                                </div>
+                                <span class="text-xs font-bold text-primary opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1">
+                                    View <span class="material-symbols-outlined text-sm">arrow_forward</span>
+                                </span>
+                            </div>
+                        </div>
+                    </a>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="text-center py-20 bg-white rounded-3xl border border-outline-variant/10 border-dashed">
+                <span class="material-symbols-outlined text-5xl text-on-surface/15 mb-3 block">school</span>
+                <p class="font-bold text-on-surface/35 font-headline text-lg">No learning tracks available yet</p>
+                <p class="text-sm text-on-surface/25 mt-1">Check back soon — new content is being added regularly.</p>
+            </div>
+        }
+    </section>
+
+    <!-- ══ OPEN COHORTS ═══════════════════════════════════════════════ -->
+    <section id="cohorts" class="space-y-8">
+        <div class="flex items-center gap-3">
+            <div class="w-11 h-11 rounded-2xl bg-secondary/10 flex items-center justify-center">
+                <span class="material-symbols-outlined text-secondary" style="font-variation-settings:'FILL' 1;">diversity_3</span>
+            </div>
+            <div>
+                <h2 class="text-2xl font-bold font-headline tracking-tight">Open Cohorts</h2>
+                <p class="text-sm text-on-surface/40 font-medium">Join a mentored group and learn together</p>
+            </div>
+        </div>
+
+        @if (groups.Any())
+        {
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+                @foreach (var g in groups)
+                {
+                    <div class="bg-white rounded-3xl p-6 border border-outline-variant/10 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col">
+                        <div class="flex items-center gap-3 mb-4">
+                            <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-secondary/15 to-secondary/5 flex items-center justify-center shrink-0">
+                                <span class="text-lg font-black text-secondary">@g.Name.FirstOrDefault()</span>
+                            </div>
+                            <div class="min-w-0">
+                                <h4 class="font-bold text-on-surface text-sm truncate">@g.Name</h4>
+                                <p class="text-xs text-on-surface/35 font-medium">@g.GroupMembers.Count members</p>
+                            </div>
+                        </div>
+                        @if (g.Roadmap != null)
+                        {
+                            <div class="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-secondary/5 text-xs font-bold text-secondary mb-3">
+                                <span class="material-symbols-outlined text-sm">route</span>
+                                <span class="truncate">@g.Roadmap.Title</span>
+                            </div>
+                        }
+                        @if (!string.IsNullOrEmpty(g.Description))
+                        {
+                            <p class="text-xs text-on-surface/40 leading-relaxed flex-1 line-clamp-2">@g.Description</p>
+                        }
+                        <div class="mt-auto pt-4">
+                            <a asp-controller="Group" asp-action="Join" asp-route-code="@g.JoinCode"
+                               class="w-full px-4 py-3 bg-secondary/10 text-secondary rounded-2xl font-bold text-xs text-center block hover:bg-secondary hover:text-white transition-all duration-200 active:scale-[0.97]">
+                                Join Cohort →
+                            </a>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="text-center py-20 bg-white rounded-3xl border border-outline-variant/10 border-dashed">
+                <span class="material-symbols-outlined text-5xl text-on-surface/15 mb-3 block">groups</span>
+                <p class="font-bold text-on-surface/35 font-headline text-lg">No open cohorts right now</p>
+                <p class="text-sm text-on-surface/25 mt-1">New groups are opened regularly by mentors.</p>
+            </div>
+        }
+    </section>
+
 </div>

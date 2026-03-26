@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace GDG_DashBoard.Controllers;
 
-[Authorize]
+[Authorize(Roles = "Admin,Organizer,Mentor")]
 public class InstructorController : Controller
 {
     private readonly IGroupService _groupService;
@@ -27,11 +27,18 @@ public class InstructorController : Controller
         var user = await _userManager.GetUserAsync(User);
         if (user == null) return Challenge();
 
-        var groups = await _groupService.GetGroupsForInstructorAsync(user.Id);
-        ViewBag.TotalInstructorRoadmaps = await _context.Roadmaps.CountAsync(r => r.CreatedByUserId == user.Id);
+        IEnumerable<CommunityGroup> groups;
+        if (await _userManager.IsInRoleAsync(user, "Admin") || await _userManager.IsInRoleAsync(user, "Organizer"))
+        {
+            groups = await _groupService.GetAllGroupsAsync();
+            ViewBag.TotalInstructorRoadmaps = await _context.Roadmaps.CountAsync();
+        }
+        else
+        {
+            groups = await _groupService.GetGroupsForInstructorAsync(user.Id);
+            ViewBag.TotalInstructorRoadmaps = await _context.Roadmaps.CountAsync(r => r.CreatedByUserId == user.Id);
+        }
         
         return View(groups);
     }
-
-  
 }

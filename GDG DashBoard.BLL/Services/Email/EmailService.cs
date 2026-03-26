@@ -5,7 +5,6 @@ using MimeKit;
 using MimeKit.Text;
 using MailKit.Net.Smtp;
 using MailKit.Security;
-
 namespace GDG_DashBoard.BLL.Services.Email;
 
 public class EmailService : IEmailService

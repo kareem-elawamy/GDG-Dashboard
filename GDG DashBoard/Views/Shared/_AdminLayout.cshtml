@@ -70,91 +70,111 @@
 </head>
 <body class="antialiased selection:bg-primary/10">
 
+    <!-- ══ SIDEBAR OVERLAY ══════════════════════════════════════════════════ -->
+    <div id="sidebarOverlay" class="fixed inset-0 bg-on-surface/50 z-50 hidden md:hidden backdrop-blur-sm transition-opacity"></div>
+
     <!-- ══ SIDEBAR ══════════════════════════════════════════════════════════ -->
-    <aside class="hidden md:flex bg-[#f6f3f2] h-screen w-64 fixed left-0 top-0 flex-col p-6 space-y-4 font-body font-medium text-sm tracking-wide text-on-surface z-[60] border-r border-outline-variant/20">
-        <div class="mb-8 flex flex-col">
-            <img src="~/image/gdg_bandung_logo_only.png.png" asp-append-version="true" alt="GDG Logo" class="w-12 h-auto mb-2" onerror="this.onerror=null; this.src='https://via.placeholder.com/48x48?text=G';" />
-            <h1 class="text-xl font-bold font-headline text-on-surface">GDG Dashboard</h1>
-            <p class="text-[10px] text-on-surface/50 font-bold uppercase tracking-wider">Google Developer Groups</p>
+    <aside id="sidebar" class="group fixed inset-y-0 left-0 bg-[#f6f3f2] w-72 md:w-20 md:hover:w-72 flex flex-col p-4 overflow-hidden font-body font-medium text-sm tracking-wide text-on-surface z-[60] border-r border-outline-variant/20 transform -translate-x-full md:translate-x-0 transition-all duration-300 ease-in-out hover:shadow-2xl">
+        <!-- LOGO -->
+        <div class="flex items-center gap-3 px-2 py-3 shrink-0 mb-2">
+            <img src="~/image/gdg_bandung_logo_only.png.png" asp-append-version="true" alt="GDG Logo" class="w-10 h-10 shrink-0 object-contain" onerror="this.onerror=null; this.src='https://via.placeholder.com/40x40?text=G';" />
+            <div class="md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300 overflow-hidden whitespace-nowrap min-w-0">
+                <h1 class="text-xl font-bold font-headline text-on-surface whitespace-nowrap">GDG Dashboard</h1>
+                <p class="text-[10px] text-on-surface/50 font-bold uppercase tracking-wider whitespace-nowrap">Google Developer Groups</p>
+            </div>
         </div>
 
-        <nav class="flex-1 space-y-2 mt-4">
-            
-            <a class="flex items-center space-x-3 px-4 py-3 rounded-lg hover:text-gdg-blue hover:bg-surface-container-high transition-all @(ViewContext.RouteData.Values["controller"]?.ToString() == "Home" ? "sidebar-active" : "text-on-surface/70")"
-               asp-controller="Home" asp-action="Index">
-                <span class="material-symbols-outlined">home</span>
-                <span>Home</span>
+        <!-- NAV LINKS -->
+        <nav class="flex-1 flex flex-col gap-1 min-h-0 overflow-hidden w-full">
+
+            <a class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:text-gdg-blue hover:bg-surface-container-high transition-all shrink min-h-0 w-full @(ViewContext.RouteData.Values["controller"]?.ToString() == "Home" ? "sidebar-active" : "text-on-surface/70")"
+               asp-controller="Home" asp-action="Index" title="Home">
+                <span class="material-symbols-outlined shrink-0 w-7 text-center text-2xl">home</span>
+                <span class="md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap overflow-hidden">Home</span>
             </a>
 
-            @if (User.IsInRole("Admin"))
+            @if (User.IsInRole("Admin") || User.IsInRole("Organizer"))
             {
-                <div class="pt-4 pb-2 px-4 uppercase text-[10px] tracking-wider font-bold text-on-surface/40">Admin Menu</div>
-                
-                <a class="flex items-center space-x-3 px-4 py-3 rounded-lg hover:text-gdg-blue hover:bg-surface-container-high transition-all @(ViewContext.RouteData.Values["controller"]?.ToString() == "Admin" && ViewContext.RouteData.Values["action"]?.ToString() == "Index" ? "sidebar-active" : "text-on-surface/70")"
-                   asp-controller="Admin" asp-action="Index">
-                    <span class="material-symbols-outlined">dashboard</span>
-                    <span>Admin Dashboard</span>
+                <a class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:text-gdg-blue hover:bg-surface-container-high transition-all shrink min-h-0 w-full @(ViewContext.RouteData.Values["controller"]?.ToString() == "Admin" && ViewContext.RouteData.Values["action"]?.ToString() == "Index" ? "sidebar-active" : "text-on-surface/70")"
+                   asp-controller="Admin" asp-action="Index" title="Admin Dashboard">
+                    <span class="material-symbols-outlined shrink-0 w-7 text-center text-2xl">dashboard</span>
+                    <span class="md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap overflow-hidden">Admin Dashboard</span>
                 </a>
-                
-                <a class="flex items-center space-x-3 px-4 py-3 rounded-lg hover:text-gdg-blue hover:bg-surface-container-high transition-all @(ViewContext.RouteData.Values["action"]?.ToString() == "Onboard" ? "sidebar-active" : "text-on-surface/70")"
-                   asp-controller="Admin" asp-action="Onboard">
-                    <span class="material-symbols-outlined" style="@(ViewContext.RouteData.Values["action"]?.ToString() == "Onboard" ? "font-variation-settings:'FILL' 1;" : "")">person_add</span>
-                    <span>Add New Member</span>
+
+                <a class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:text-gdg-blue hover:bg-surface-container-high transition-all shrink min-h-0 w-full @(ViewContext.RouteData.Values["action"]?.ToString() == "Onboard" ? "sidebar-active" : "text-on-surface/70")"
+                   asp-controller="Admin" asp-action="Onboard" title="Add New Member">
+                    <span class="material-symbols-outlined shrink-0 w-7 text-center text-2xl" style="@(ViewContext.RouteData.Values["action"]?.ToString() == "Onboard" ? "font-variation-settings:'FILL' 1;" : "font-variation-settings:'FILL' 0;")">person_add</span>
+                    <span class="md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap overflow-hidden">Add New Member</span>
                 </a>
             }
 
-            @if (!User.IsInRole("Instructor"))
+            @if (User.IsInRole("Admin") || User.IsInRole("Organizer") || User.IsInRole("Mentor"))
             {
-                <div class="pt-4 pb-2 px-4 uppercase text-[10px] tracking-wider font-bold text-on-surface/40">Instructor Menu</div>
-                
-                <a class="flex items-center space-x-3 px-4 py-3 rounded-lg hover:text-gdg-blue hover:bg-surface-container-high transition-all @(ViewContext.RouteData.Values["controller"]?.ToString() == "Instructor" && ViewContext.RouteData.Values["action"]?.ToString() == "Index" ? "sidebar-active" : "text-on-surface/70")"
-                   asp-controller="Instructor" asp-action="Index">
-                    <span class="material-symbols-outlined">groups</span>
-                    <span>Instructor Console</span>
+                <a class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:text-gdg-blue hover:bg-surface-container-high transition-all shrink min-h-0 w-full @(ViewContext.RouteData.Values["controller"]?.ToString() == "Instructor" && ViewContext.RouteData.Values["action"]?.ToString() == "Index" ? "sidebar-active" : "text-on-surface/70")"
+                   asp-controller="Instructor" asp-action="Index" title="Mentor Console">
+                    <span class="material-symbols-outlined shrink-0 w-7 text-center text-2xl">school</span>
+                    <span class="md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap overflow-hidden">Mentor Console</span>
                 </a>
             }
-            <!-- Other dummy views removed for explicitly wired navigation as requested -->
+
+            @if (User.IsInRole("Admin") || User.IsInRole("Organizer") || User.IsInRole("Speaker"))
+            {
+                <a class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:text-gdg-blue hover:bg-surface-container-high transition-all shrink min-h-0 w-full @(ViewContext.RouteData.Values["controller"]?.ToString() == "Roadmap" && ViewContext.RouteData.Values["action"]?.ToString() == "Index" ? "sidebar-active" : "text-on-surface/70")"
+                   asp-controller="Roadmap" asp-action="Index" title="Roadmap Builder">
+                    <span class="material-symbols-outlined shrink-0 w-7 text-center text-2xl">route</span>
+                    <span class="md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap overflow-hidden">Roadmap Builder</span>
+                </a>
+            }
+
+            <a class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:text-gdg-blue hover:bg-surface-container-high transition-all shrink min-h-0 w-full @(ViewContext.RouteData.Values["action"]?.ToString() == "MyProfile" ? "sidebar-active" : "text-on-surface/70")"
+               asp-controller="Member" asp-action="MyProfile" title="My Profile">
+                <span class="material-symbols-outlined shrink-0 w-7 text-center text-2xl">account_circle</span>
+                <span class="md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap overflow-hidden">My Profile</span>
+            </a>
+
+            <a class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:text-gdg-blue hover:bg-surface-container-high transition-all shrink min-h-0 w-full @(ViewContext.RouteData.Values["controller"]?.ToString() == "Member" && ViewContext.RouteData.Values["action"]?.ToString() == "MyRoadmaps" ? "sidebar-active" : "text-on-surface/70")"
+               asp-controller="Member" asp-action="MyRoadmaps" title="My Roadmaps">
+                <span class="material-symbols-outlined shrink-0 w-7 text-center text-2xl">menu_book</span>
+                <span class="md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap overflow-hidden">My Roadmaps</span>
+            </a>
+
         </nav>
 
-        <div class="pt-6 mt-auto border-t border-outline-variant/20 space-y-1">
-            <div class="pb-2 px-4 uppercase text-[10px] tracking-wider font-bold text-on-surface/40">My Learning</div>
-            <a class="flex items-center space-x-3 px-4 py-3 rounded-lg hover:text-gdg-blue hover:bg-surface-container-high transition-all mb-4 @(ViewContext.RouteData.Values["controller"]?.ToString() == "Member" ? "sidebar-active" : "text-on-surface/70")"
-               asp-controller="Member" asp-action="Index">
-                <span class="material-symbols-outlined">person</span>
-                <span>My Profile</span>
+        <!-- FOOTER -->
+        <div class="pt-2 mt-auto border-t border-outline-variant/20 space-y-1 shrink-0">
+            <a class="flex items-center gap-3 text-on-surface/70 px-3 py-2.5 hover:text-gdg-blue hover:bg-surface-container-high transition-all rounded-lg w-full" href="#" title="Settings">
+                <span class="material-symbols-outlined shrink-0 w-7 text-center text-2xl">settings</span>
+                <span class="md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap overflow-hidden">Settings</span>
             </a>
-            
-            <hr class="border-outline-variant/20 mb-2" />
-            
-            <a class="flex items-center space-x-3 text-on-surface/70 px-4 py-3 hover:text-gdg-blue hover:bg-surface-container-high transition-all rounded-lg" href="#">
-                <span class="material-symbols-outlined">settings</span>
-                <span>Settings</span>
-            </a>
-            <form asp-controller="Auth" asp-action="Logout" method="post">
+
+            <form asp-controller="Auth" asp-action="Logout" method="post" class="w-full">
                 @Html.AntiForgeryToken()
-                <button type="submit" class="flex w-full items-center space-x-3 text-on-surface/70 px-4 py-3 hover:text-gdg-red hover:bg-gdg-red/5 transition-all rounded-lg">
-                    <span class="material-symbols-outlined">logout</span>
-                    <span>Logout</span>
+                <button type="submit" title="Logout" class="flex w-full items-center gap-3 text-on-surface/70 px-3 py-2.5 hover:text-gdg-red hover:bg-gdg-red/5 transition-all rounded-lg">
+                    <span class="material-symbols-outlined shrink-0 w-7 text-center text-2xl">logout</span>
+                    <span class="md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap overflow-hidden">Logout</span>
                 </button>
             </form>
         </div>
     </aside>
 
     <!-- ══ MAIN AREA ═════════════════════════════════════════════════════════ -->
-    <div class="md:ml-64 min-h-screen flex flex-col">
+    <div class="md:ml-20 min-h-screen flex flex-col transition-all duration-300 ease-in-out">
 
         <!-- TOP APP BAR -->
         <header class="bg-[#fcf9f8]/80 backdrop-blur-xl sticky top-0 z-50 flex justify-between items-center w-full px-8 h-16 shadow-[0_12px_40px_rgba(27,27,28,0.04)] border-b border-outline-variant/10">
             <div class="flex items-center space-x-4">
-                <span class="text-xl font-bold font-headline tracking-tight text-on-surface">@ViewData["PageTitle"]</span>
+                <button id="mobileMenuBtn" class="md:hidden p-2 -ml-2 rounded-lg hover:bg-surface-container-high transition-colors active:scale-95 text-on-surface">
+                    <span class="material-symbols-outlined">menu</span>
+                </button>
+                <span class="text-xl font-bold font-headline tracking-tight text-on-surface hidden sm:block">@ViewData["PageTitle"]</span>
             </div>
             <div class="flex items-center space-x-4">
                 <button class="p-2 rounded-full hover:bg-surface-container-high transition-colors active:scale-95">
                     <span class="material-symbols-outlined">notifications</span>
                 </button>
-                <div class="w-8 h-8 rounded-full bg-surface-container-highest flex items-center justify-center overflow-hidden border border-outline-variant/20">
+                <a asp-controller="Member" asp-action="MyProfile" class="w-8 h-8 rounded-full bg-surface-container-highest flex items-center justify-center overflow-hidden border border-outline-variant/20 transition-all hover:ring-2 hover:ring-primary/50">
                     <span class="material-symbols-outlined text-gdg-blue" style="font-variation-settings: 'FILL' 1;">account_circle</span>
-                </div>
+                </a>
             </div>
         </header>
 
@@ -165,5 +185,25 @@
     </div>
 
     @await RenderSectionAsync("Scripts", required: false)
+    
+    <script>
+        const mnBtn = document.getElementById('mobileMenuBtn');
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('sidebarOverlay');
+
+        function toggleSidebar() {
+            if (!sidebar || !overlay) return;
+            const isClosed = sidebar.classList.contains('-translate-x-full');
+            if (isClosed) {
+                sidebar.classList.remove('-translate-x-full');
+                overlay.classList.remove('hidden');
+            } else {
+                sidebar.classList.add('-translate-x-full');
+                overlay.classList.add('hidden');
+            }
+        }
+        if (mnBtn) mnBtn.addEventListener('click', toggleSidebar);
+        if (overlay) overlay.addEventListener('click', toggleSidebar);
+    </script>
 </body>
 </html>

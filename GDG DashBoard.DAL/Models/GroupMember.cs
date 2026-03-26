@@ -1,6 +1,6 @@
 namespace GDG_DashBoard.DAL.Models;
 
-public class GroupMember
+public class GroupMember : BaseEntity
 {
     public Guid GroupId { get; set; }
     public Guid MemberId { get; set; }

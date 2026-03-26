@@ -9,6 +9,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using GDG_DashBoard.BLL.Services.Group;
 using GDG_DashBoard.BLL.Services.RoadmapServices;
+using GDG_DashBoard.BLL.Services.Member;
+using GDG_DashBoard.BLL.Services.Ai;
 var builder = WebApplication.CreateBuilder(args);
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
@@ -29,7 +31,7 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole<Guid>>(options =>
     options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(10);
     options.Lockout.MaxFailedAccessAttempts = 5;
 })
-.AddRoles<IdentityRole<Guid>>()            // ← CRITICAL: registers RoleClaimsPrincipalFactory
+.AddRoles<IdentityRole<Guid>>()           
 .AddEntityFrameworkStores<AppDbContext>()
 .AddDefaultTokenProviders();
 
@@ -44,6 +46,7 @@ builder.Services.ConfigureApplicationCookie(options =>
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddHttpContextAccessor();
+builder.Services.AddHttpClient();
 
 // ── Generic Repository ─────────────────────────────────────────────────────
 builder.Services.AddScoped(typeof(IGenericRepositoryAsync<>), typeof(GenericRepositoryAsync<>));
@@ -55,6 +58,8 @@ builder.Services.AddScoped<IAdminService, AdminService>();
 builder.Services.AddScoped<IRoleService, RoleService>();
 builder.Services.AddScoped<IGroupService, GroupService>();
 builder.Services.AddScoped<IRoadmapService, RoadmapService>();
+builder.Services.AddScoped<IMemberService,MemberService>();
+builder.Services.AddScoped<ICvParserService, GeminiCvParserService>();
 
 var app = builder.Build();
 

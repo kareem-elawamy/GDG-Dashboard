@@ -7,7 +7,9 @@ public interface IGroupService
     Task<CommunityGroup> CreateGroupAsync(string name, string description, Guid instructorId);
     Task AddMembersToGroupBulkAsync(Guid groupId, List<Guid> memberIds);
     Task AssignRoadmapToGroupAsync(Guid groupId, Guid roadmapId);
+    Task<List<CommunityGroup>> GetAllGroupsAsync();
     Task<List<CommunityGroup>> GetGroupsForInstructorAsync(Guid instructorId);
+    Task<List<CommunityGroup>> GetOpenCohortsAsync(int count = 8);
     Task<CommunityGroup?> GetGroupDetailsAsync(Guid groupId);
     Task<List<ApplicationUser>> GetAvailableUsersAsync();
     Task<List<Roadmap>> GetAvailableRoadmapsAsync();

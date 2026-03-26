@@ -1,0 +1,77 @@
+@model GDG_DashBoard.BLL.Dtos.Member.MemberDashboardDto
+
+@{
+    ViewData["Title"] = "My Roadmaps";
+    Layout = "_AdminLayout";
+    ViewData["PageTitle"] = "My Roadmaps";
+}
+
+<div class="max-w-7xl mx-auto space-y-10 px-4 py-8 sm:px-6 lg:px-8">
+
+    <!-- Header -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div class="flex items-center gap-3">
+            <div class="w-11 h-11 rounded-2xl bg-primary/10 flex items-center justify-center">
+                <span class="material-symbols-outlined text-primary text-2xl" style="font-variation-settings:'FILL' 1;">map</span>
+            </div>
+            <div>
+                <h1 class="text-2xl font-bold font-headline tracking-tight text-on-surface">My Learning Tracks</h1>
+                <p class="text-sm text-on-surface/40 font-medium">Your enrolled roadmaps and progress</p>
+            </div>
+        </div>
+        <a asp-controller="Home" asp-action="Index" class="px-5 py-2.5 bg-white border border-outline-variant/20 hover:border-primary/25 hover:shadow-md text-on-surface rounded-2xl font-bold inline-flex items-center gap-2 transition-all text-sm active:scale-[0.97]">
+            <span class="material-symbols-outlined text-sm">explore</span> Browse Directory
+        </a>
+    </div>
+
+    @if (Model.ActiveRoadmaps.Any())
+    {
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            @{ string[] accents = { "from-primary to-[#8ab4f8]", "from-secondary to-[#81c995]", "from-tertiary to-[#fdd663]", "from-error to-[#f28b82]" }; }
+            @for (int i = 0; i < Model.ActiveRoadmaps.Count; i++)
+            {
+                var roadmap = Model.ActiveRoadmaps[i];
+                var accent = accents[i % accents.Length];
+
+                <div class="bg-white border border-outline-variant/10 rounded-3xl overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col group">
+                    <div class="h-1.5 bg-gradient-to-r @accent"></div>
+                    <div class="p-7 flex-1 flex flex-col">
+                        <div class="flex items-start justify-between mb-5">
+                            <h3 class="font-headline font-bold text-lg text-on-surface group-hover:text-primary transition-colors leading-snug flex-1 mr-3">@roadmap.Title</h3>
+                            <span class="px-3 py-1 bg-secondary/8 text-secondary text-[10px] font-black uppercase tracking-wider rounded-xl shrink-0">@roadmap.Status</span>
+                        </div>
+
+                        <div class="mt-auto">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-xs font-bold text-on-surface/40">Progress</span>
+                                <span class="text-xs font-black text-on-surface tabular-nums">@roadmap.ProgressPercentage%</span>
+                            </div>
+                            <div class="w-full h-2 bg-surface-container-highest rounded-full overflow-hidden">
+                                <div class="h-full bg-gradient-to-r @accent rounded-full transition-all duration-1000" style="width: @roadmap.ProgressPercentage%"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <a asp-controller="Member" asp-action="RoadmapDetails" asp-route-id="@roadmap.RoadmapId"
+                       class="block px-7 py-4 border-t border-outline-variant/8 bg-[#fafafa] hover:bg-primary/5 flex justify-between items-center transition-colors">
+                        <span class="text-xs font-bold text-on-surface/40 uppercase tracking-wider">Active Track</span>
+                        <span class="text-sm font-bold text-primary flex items-center gap-1">
+                            Continue <span class="material-symbols-outlined text-base">arrow_forward</span>
+                        </span>
+                    </a>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="text-center py-24 bg-white rounded-3xl border border-outline-variant/10 border-dashed">
+            <span class="material-symbols-outlined text-6xl text-on-surface/15 mb-4 block" style="font-variation-settings:'FILL' 0;">map</span>
+            <p class="font-bold font-headline text-2xl mb-2 text-on-surface/40">No Active Roadmaps</p>
+            <p class="text-sm font-medium text-on-surface/30 mb-8 max-w-md mx-auto">You aren't enrolled in any learning tracks. Join a Cohort or browse the directory to start learning!</p>
+            <a asp-controller="Home" asp-action="Index" class="px-8 py-3.5 bg-primary text-white rounded-2xl font-bold inline-flex items-center gap-2 hover:bg-primary/90 transition-all shadow-xl shadow-primary/15 active:scale-[0.97]">
+                <span class="material-symbols-outlined text-lg text-white">travel_explore</span>
+                Discover Roadmaps
+            </a>
+        </div>
+    }
+</div>

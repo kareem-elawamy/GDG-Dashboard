@@ -1,0 +1,445 @@
+@model GDG_DashBoard.BLL.ViewModels.Member.MemberProfileViewModel
+
+@{
+    ViewData["Title"] = "Update My Profile";
+    Layout = "_AdminLayout";
+}
+
+<div class="px-4 py-8 mx-auto max-w-7xl sm:px-6 lg:px-8">
+    <div class="flex items-center justify-between mb-8">
+        <h1 class="text-2xl font-bold text-gray-900">Edit Career Profile</h1>
+        <a asp-action="Index" class="text-sm font-medium text-blue-600 hover:underline">&larr; Back to Dashboard</a>
+    </div>
+
+    <!-- The Magic AI Upload Card -->
+    <div class="p-6 mb-8 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-100 rounded-2xl shadow-sm">
+        <h2 class="text-lg font-bold text-gray-900 mb-2">Automate with AI ✨</h2>
+        <p class="text-sm text-gray-600 mb-4">Upload your PDF Resume, and our Gemini AI agent will instantly parse your history into the GDPR-compliant GDG framework. No manual typing required!</p>
+        
+        <div class="flex flex-col sm:flex-row items-center gap-4">
+            <input type="file" id="cvUploader" accept="application/pdf" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" />
+            
+            <button type="button" id="magicParseBtn" class="whitespace-nowrap flex items-center justify-center px-6 py-2 border border-transparent text-sm font-medium rounded-full shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                <span id="magicParseText">🛡️ Upload CV (Auto-Fill via AI)</span>
+                <!-- Loading Spinner hidden by default -->
+                <svg id="magicSpinner" class="hidden w-5 h-5 ml-2 text-white animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+            </button>
+        </div>
+        <p id="magicError" class="mt-2 text-sm text-red-600 hidden"></p>
+    </div>
+
+    <form asp-action="EditProfile" method="post" id="profileForm" class="space-y-8">
+        
+        <!-- Core Info -->
+        <div class="p-6 bg-white border border-gray-100 shadow-sm rounded-2xl">
+            <h3 class="mb-4 text-xl font-bold text-gray-900 border-b pb-2">Basic Info</h3>
+            <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                <div>
+                    <label asp-for="FullName" class="block text-sm font-medium text-gray-700">Full Name</label>
+                    <input asp-for="FullName" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm" />
+                </div>
+                <div>
+                    <label asp-for="Email" class="block text-sm font-medium text-gray-700">Email Address (CV Data)</label>
+                    <input asp-for="Email" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-50 focus:ring-blue-500 focus:border-blue-500 sm:text-sm" />
+                </div>
+                <div>
+                    <label asp-for="Phone" class="block text-sm font-medium text-gray-700">Phone</label>
+                    <input asp-for="Phone" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm" />
+                </div>
+                <div>
+                    <label asp-for="Location" class="block text-sm font-medium text-gray-700">Location</label>
+                    <input asp-for="Location" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm" />
+                </div>
+                
+                <div class="sm:col-span-2">
+                    <label asp-for="ProfessionalSummary" class="block text-sm font-medium text-gray-700">Professional Summary</label>
+                    <textarea asp-for="ProfessionalSummary" rows="4" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"></textarea>
+                </div>
+
+                <div>
+                    <label asp-for="GitHubUrl" class="block text-sm font-medium text-gray-700">GitHub URL</label>
+                    <input asp-for="GitHubUrl" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm" />
+                </div>
+                <div>
+                    <label asp-for="LinkedInUrl" class="block text-sm font-medium text-gray-700">LinkedIn URL</label>
+                    <input asp-for="LinkedInUrl" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm" />
+                </div>
+            </div>
+        </div>
+
+        <!-- Experience Array -->
+        <div class="p-6 bg-white border border-gray-100 shadow-sm rounded-2xl">
+            <div class="flex items-center justify-between border-b pb-2 mb-4">
+                <h3 class="text-xl font-bold text-gray-900">Experience</h3>
+                <button type="button" onclick="addExperience()" class="px-3 py-1 text-sm text-blue-600 bg-blue-50 rounded hover:bg-blue-100">+ Add Job</button>
+            </div>
+            <div id="experienceContainer" class="space-y-4">
+                @for(int i = 0; i < Model.Experiences.Count; i++)
+                {
+                    <div class="exp-row p-4 border border-gray-200 rounded-lg relative">
+                        <button type="button" onclick="this.parentElement.remove()" class="absolute top-2 right-2 text-red-500 hover:text-red-700">&times;</button>
+                        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Job Title</label>
+                                <input type="text" name="Experiences[@i].Title" value="@Model.Experiences[i].Title" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md" />
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Company</label>
+                                <input type="text" name="Experiences[@i].Company" value="@Model.Experiences[i].Company" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md" />
+                            </div>
+                            <div class="sm:col-span-2">
+                                <label class="block text-sm font-medium text-gray-700">Period / Dates</label>
+                                <input type="text" name="Experiences[@i].Period" value="@Model.Experiences[i].Period" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md" />
+                            </div>
+                            <div class="sm:col-span-2">
+                                <label class="block text-sm font-medium text-gray-700">Description</label>
+                                <textarea name="Experiences[@i].Description" rows="2" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md">@Model.Experiences[i].Description</textarea>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+        
+        <!-- Education Array -->
+        <div class="p-6 bg-white border border-gray-100 shadow-sm rounded-2xl">
+            <div class="flex items-center justify-between border-b pb-2 mb-4">
+                <h3 class="text-xl font-bold text-gray-900">Education</h3>
+                <button type="button" onclick="addEducation()" class="px-3 py-1 text-sm text-blue-600 bg-blue-50 rounded hover:bg-blue-100">+ Add Education</button>
+            </div>
+            <div id="educationContainer" class="space-y-4">
+                @for(int i = 0; i < Model.Educations.Count; i++)
+                {
+                    <div class="edu-row p-4 border border-gray-200 rounded-lg relative">
+                        <button type="button" onclick="this.parentElement.remove()" class="absolute top-2 right-2 text-red-500 hover:text-red-700">&times;</button>
+                        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                            <div class="sm:col-span-2">
+                                <label class="block text-sm font-medium text-gray-700">Degree/Certificate</label>
+                                <input type="text" name="Educations[@i].Degree" value="@Model.Educations[i].Degree" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md" />
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">University</label>
+                                <input type="text" name="Educations[@i].University" value="@Model.Educations[i].University" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md" />
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Year / Graduation</label>
+                                <input type="text" name="Educations[@i].Year" value="@Model.Educations[i].Year" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md" />
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <!-- Projects Array -->
+        <div class="p-6 bg-white border border-gray-100 shadow-sm rounded-2xl">
+            <div class="flex items-center justify-between mb-4 pb-2 border-b">
+                <h3 class="text-xl font-bold text-gray-900">Projects</h3>
+                <button type="button" onclick="addProject()" class="px-3 py-1 text-sm text-blue-600 bg-blue-50 rounded hover:bg-blue-100">+ Add Project</button>
+            </div>
+            <div id="projectContainer" class="space-y-4">
+                @for(int i = 0; i < Model.Projects.Count; i++)
+                {
+                    <div class="proj-row p-4 border border-gray-200 rounded-lg relative">
+                        <button type="button" onclick="this.parentElement.remove()" class="absolute top-2 right-2 text-red-500 hover:text-red-700">&times;</button>
+                        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Project Name</label>
+                                <input type="text" name="Projects[@i].Name" value="@Model.Projects[i].Name" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md" />
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Period / Dates</label>
+                                <input type="text" name="Projects[@i].Period" value="@Model.Projects[i].Period" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md" />
+                            </div>
+                            <div class="sm:col-span-2">
+                                <label class="block text-sm font-medium text-gray-700">URL</label>
+                                <input type="url" name="Projects[@i].Url" value="@Model.Projects[i].Url" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md" />
+                            </div>
+                            <div class="sm:col-span-2">
+                                <label class="block text-sm font-medium text-gray-700">Description</label>
+                                <textarea name="Projects[@i].Description" rows="2" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md">@Model.Projects[i].Description</textarea>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <!-- Skills Array -->
+        <div class="p-6 bg-white border border-gray-100 shadow-sm rounded-2xl">
+            <h3 class="mb-4 text-xl font-bold text-gray-900 border-b pb-2">Skills</h3>
+            <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                <!-- Technical Skills -->
+                <div>
+                    <div class="flex items-center justify-between mb-2">
+                        <label class="block text-sm font-medium text-gray-700">Technical Skills</label>
+                        <button type="button" onclick="addTechSkill()" class="text-xs text-blue-600 hover:underline">+ Add Tech Skill</button>
+                    </div>
+                    <div id="techSkillContainer" class="flex flex-wrap gap-2">
+                        @for (int i = 0; i < Model.TechnicalSkills.Count; i++)
+                        {
+                            <div class="tech-row inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
+                                <input type="text" name="TechnicalSkills[@i]" value="@Model.TechnicalSkills[i]" class="bg-transparent border-none focus:ring-0 p-0 text-sm font-medium" />
+                                <button type="button" onclick="this.parentElement.remove()" class="ml-2 text-blue-600 hover:text-blue-900">&times;</button>
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                <!-- Soft Skills -->
+                <div>
+                    <div class="flex items-center justify-between mb-2">
+                        <label class="block text-sm font-medium text-gray-700">Soft Skills</label>
+                        <button type="button" onclick="addSoftSkill()" class="text-xs text-indigo-600 hover:underline">+ Add Soft Skill</button>
+                    </div>
+                    <div id="softSkillContainer" class="flex flex-wrap gap-2">
+                        @for (int i = 0; i < Model.SoftSkills.Count; i++)
+                        {
+                            <div class="soft-row inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-indigo-100 text-indigo-800">
+                                <input type="text" name="SoftSkills[@i]" value="@Model.SoftSkills[i]" class="bg-transparent border-none focus:ring-0 p-0 text-sm font-medium" />
+                                <button type="button" onclick="this.parentElement.remove()" class="ml-2 text-indigo-600 hover:text-indigo-900">&times;</button>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Submit Button -->
+        <div class="flex justify-end pt-4">
+            <button type="submit" class="px-6 py-3 text-white bg-green-600 hover:bg-green-700 rounded-xl font-bold text-lg shadow">
+                Save Profile
+            </button>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+<script>
+    // Templates for cloning
+    function getExpTemplate(i) {
+        return `
+        <div class="exp-row p-4 border border-gray-200 rounded-lg relative">
+            <button type="button" onclick="this.parentElement.remove()" class="absolute top-2 right-2 text-red-500 hover:text-red-700">&times;</button>
+            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Job Title</label>
+                    <input type="text" name="Experiences[${i}].Title" class="exp-title mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md" />
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Company</label>
+                    <input type="text" name="Experiences[${i}].Company" class="exp-company mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md" />
+                </div>
+                <div class="sm:col-span-2">
+                    <label class="block text-sm font-medium text-gray-700">Period / Dates</label>
+                    <input type="text" name="Experiences[${i}].Period" class="exp-period mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md" />
+                </div>
+                <div class="sm:col-span-2">
+                    <label class="block text-sm font-medium text-gray-700">Description</label>
+                    <textarea name="Experiences[${i}].Description" rows="2" class="exp-desc mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md"></textarea>
+                </div>
+            </div>
+        </div>`;
+    }
+
+    function getEduTemplate(i) {
+        return `
+        <div class="edu-row p-4 border border-gray-200 rounded-lg relative">
+            <button type="button" onclick="this.parentElement.remove()" class="absolute top-2 right-2 text-red-500 hover:text-red-700">&times;</button>
+            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <div class="sm:col-span-2">
+                    <label class="block text-sm font-medium text-gray-700">Degree/Certificate</label>
+                    <input type="text" name="Educations[${i}].Degree" class="edu-degree mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md" />
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">University</label>
+                    <input type="text" name="Educations[${i}].University" class="edu-uni mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md" />
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Year / Graduation</label>
+                    <input type="text" name="Educations[${i}].Year" class="edu-year mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md" />
+                </div>
+            </div>
+        </div>`;
+    }
+
+    function getProjTemplate(i) {
+        return `
+        <div class="proj-row p-4 border border-gray-200 rounded-lg relative">
+            <button type="button" onclick="this.parentElement.remove()" class="absolute top-2 right-2 text-red-500 hover:text-red-700">&times;</button>
+            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Project Name</label>
+                    <input type="text" name="Projects[${i}].Name" class="proj-name mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md" />
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Period / Dates</label>
+                    <input type="text" name="Projects[${i}].Period" class="proj-period mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md" />
+                </div>
+                <div class="sm:col-span-2">
+                    <label class="block text-sm font-medium text-gray-700">URL</label>
+                    <input type="url" name="Projects[${i}].Url" class="proj-url mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md" />
+                </div>
+                <div class="sm:col-span-2">
+                    <label class="block text-sm font-medium text-gray-700">Description</label>
+                    <textarea name="Projects[${i}].Description" rows="2" class="proj-desc mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md"></textarea>
+                </div>
+            </div>
+        </div>`;
+    }
+
+    function getTechSkillTemplate(i, val = '') {
+        return `
+        <div class="tech-row inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
+            <input type="text" name="TechnicalSkills[${i}]" value="${val}" placeholder="Skill" class="bg-transparent border-none focus:ring-0 p-0 text-sm font-medium w-24" />
+            <button type="button" onclick="this.parentElement.remove()" class="ml-2 text-blue-600 hover:text-blue-900">&times;</button>
+        </div>`;
+    }
+
+    function getSoftSkillTemplate(i, val = '') {
+        return `
+        <div class="soft-row inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-indigo-100 text-indigo-800">
+            <input type="text" name="SoftSkills[${i}]" value="${val}" placeholder="Skill" class="bg-transparent border-none focus:ring-0 p-0 text-sm font-medium w-24" />
+            <button type="button" onclick="this.parentElement.remove()" class="ml-2 text-indigo-600 hover:text-indigo-900">&times;</button>
+        </div>`;
+    }
+
+    window.addExperience = function() {
+        const container = document.getElementById('experienceContainer');
+        const count = container.querySelectorAll('.exp-row').length;
+        container.insertAdjacentHTML('beforeend', getExpTemplate(count));
+        return container.lastElementChild;
+    }
+
+    window.addEducation = function() {
+        const container = document.getElementById('educationContainer');
+        const count = container.querySelectorAll('.edu-row').length;
+        container.insertAdjacentHTML('beforeend', getEduTemplate(count));
+        return container.lastElementChild;
+    }
+
+    window.addProject = function() {
+        const container = document.getElementById('projectContainer');
+        const count = container.querySelectorAll('.proj-row').length;
+        container.insertAdjacentHTML('beforeend', getProjTemplate(count));
+        return container.lastElementChild;
+    }
+
+    window.addTechSkill = function(val = '') {
+        const container = document.getElementById('techSkillContainer');
+        const count = container.querySelectorAll('.tech-row').length;
+        container.insertAdjacentHTML('beforeend', getTechSkillTemplate(count, val));
+    }
+
+    window.addSoftSkill = function(val = '') {
+        const container = document.getElementById('softSkillContainer');
+        const count = container.querySelectorAll('.soft-row').length;
+        container.insertAdjacentHTML('beforeend', getSoftSkillTemplate(count, val));
+    }
+
+    // AI POST System
+    document.getElementById('magicParseBtn').addEventListener('click', async () => {
+        const fileInput = document.getElementById('cvUploader');
+        const errorText = document.getElementById('magicError');
+        const parseText = document.getElementById('magicParseText');
+        const spinner = document.getElementById('magicSpinner');
+
+        errorText.classList.add('hidden');
+        
+        if (!fileInput.files || fileInput.files.length === 0) {
+            errorText.innerText = "Please select a PDF file first.";
+            errorText.classList.remove('hidden');
+            return;
+        }
+
+        const btn = document.getElementById('magicParseBtn');
+        btn.disabled = true;
+        parseText.innerText = "Parsing Model...";
+        spinner.classList.remove('hidden');
+
+        try {
+            const formData = new FormData();
+            formData.append("cvFile", fileInput.files[0]);
+
+            const response = await fetch('/Member/ParseCV', {
+                method: 'POST',
+                body: formData
+            });
+
+            if (!response.ok) {
+                const errData = await response.json();
+                throw new Error(errData.error || "Failed to parse CV");
+            }
+
+            const data = await response.json();
+            
+            if(data.name) document.getElementById('FullName').value = data.name;
+            if(data.email) document.getElementById('Email').value = data.email;
+            if(data.phone) document.getElementById('Phone').value = data.phone;
+            if(data.location) document.getElementById('Location').value = data.location;
+            if(data.professional_summary) document.getElementById('ProfessionalSummary').value = data.professional_summary;
+
+            // Arrays
+            const expContainer = document.getElementById('experienceContainer');
+            expContainer.innerHTML = ''; 
+            if (data.professional_experience && Array.isArray(data.professional_experience)) {
+                data.professional_experience.forEach((exp, idx) => {
+                    const row = window.addExperience();
+                    row.querySelector('.exp-title').value = exp.title || '';
+                    row.querySelector('.exp-company').value = exp.company || '';
+                    row.querySelector('.exp-period').value = exp.period || '';
+                    row.querySelector('.exp-desc').value = exp.description || '';
+                });
+            }
+
+            const eduContainer = document.getElementById('educationContainer');
+            eduContainer.innerHTML = '';
+            if (data.education && Array.isArray(data.education)) {
+                data.education.forEach((edu, idx) => {
+                    const row = window.addEducation();
+                    row.querySelector('.edu-degree').value = edu.degree || '';
+                    row.querySelector('.edu-uni').value = edu.university || '';
+                    row.querySelector('.edu-year').value = edu.year || '';
+                });
+            }
+
+            const projContainer = document.getElementById('projectContainer');
+            projContainer.innerHTML = '';
+            if (data.projects && Array.isArray(data.projects)) {
+                data.projects.forEach((proj, idx) => {
+                    const row = window.addProject();
+                    row.querySelector('.proj-name').value = proj.name || '';
+                    row.querySelector('.proj-period').value = proj.period || '';
+                    row.querySelector('.proj-desc').value = proj.description || '';
+                });
+            }
+
+            const techContainer = document.getElementById('techSkillContainer');
+            techContainer.innerHTML = '';
+            if (data.technical_skills && Array.isArray(data.technical_skills)) {
+                data.technical_skills.forEach(s => window.addTechSkill(s));
+            }
+
+            const softContainer = document.getElementById('softSkillContainer');
+            softContainer.innerHTML = '';
+            if (data.soft_skills && Array.isArray(data.soft_skills)) {
+                data.soft_skills.forEach(s => window.addSoftSkill(s));
+            }
+
+            parseText.innerText = "✨ Extracted Successfully!";
+            setTimeout(() => {
+                parseText.innerText = "🛡️ Upload CV (Auto-Fill via AI)";
+            }, 3000);
+
+        } catch (ex) {
+            errorText.innerText = ex.message;
+            errorText.classList.remove('hidden');
+            parseText.innerText = "🛡️ Upload CV (Auto-Fill via AI)";
+        } finally {
+            spinner.classList.add('hidden');
+            btn.disabled = false;
+        }
+    });
+
+</script>
+}

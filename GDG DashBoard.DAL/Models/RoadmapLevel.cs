@@ -1,8 +1,9 @@
-﻿namespace GDG_DashBoard.DAL.Models;
+namespace GDG_DashBoard.DAL.Models;
 
 public class RoadmapLevel : BaseEntity
 {
     public Guid RoadmapId { get; set; }
+    [System.ComponentModel.DataAnnotations.MaxLength(250)]
     public required string Title { get; set; }
     public string? Instructions { get; set; }
     public int OrderIndex { get; set; }

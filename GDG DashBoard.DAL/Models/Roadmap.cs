@@ -4,6 +4,7 @@ namespace GDG_DashBoard.DAL.Models;
 
 public class Roadmap : BaseEntity
 {
+    [System.ComponentModel.DataAnnotations.MaxLength(250)]
     public required string Title { get; set; }
     public string? Description { get; set; }
 

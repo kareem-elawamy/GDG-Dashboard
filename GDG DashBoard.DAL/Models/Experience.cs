@@ -1,9 +1,11 @@
-﻿namespace GDG_DashBoard.DAL.Models;
+namespace GDG_DashBoard.DAL.Models;
 
 public class Experience : BaseEntity
 {
     public Guid UserProfileId { get; set; }
+    [System.ComponentModel.DataAnnotations.MaxLength(250)]
     public required string Title { get; set; }
+    [System.ComponentModel.DataAnnotations.MaxLength(250)]
     public required string Company { get; set; }
     public string? Description { get; set; }
 

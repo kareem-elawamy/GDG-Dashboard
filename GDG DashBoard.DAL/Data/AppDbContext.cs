@@ -101,7 +101,30 @@ namespace GDGDashBoard.DAL.Data
                 .HasForeignKey(cg => cg.InstructorId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // 3. Enum Conversions
+            // 3. NewSequentialId Configuration (Prevent GUID Index Fragmentation)
+            builder.Entity<UserProfile>().Property(e => e.Id).HasDefaultValueSql("NEWSEQUENTIALID()");
+            builder.Entity<UserSkill>().Property(e => e.Id).HasDefaultValueSql("NEWSEQUENTIALID()");
+            builder.Entity<Education>().Property(e => e.Id).HasDefaultValueSql("NEWSEQUENTIALID()");
+            builder.Entity<Experience>().Property(e => e.Id).HasDefaultValueSql("NEWSEQUENTIALID()");
+            builder.Entity<Project>().Property(e => e.Id).HasDefaultValueSql("NEWSEQUENTIALID()");
+            builder.Entity<Roadmap>().Property(e => e.Id).HasDefaultValueSql("NEWSEQUENTIALID()");
+            builder.Entity<RoadmapLevel>().Property(e => e.Id).HasDefaultValueSql("NEWSEQUENTIALID()");
+            builder.Entity<Resource>().Property(e => e.Id).HasDefaultValueSql("NEWSEQUENTIALID()");
+            builder.Entity<UserEnrollment>().Property(e => e.Id).HasDefaultValueSql("NEWSEQUENTIALID()");
+            builder.Entity<UserNodeProgress>().Property(e => e.Id).HasDefaultValueSql("NEWSEQUENTIALID()");
+            builder.Entity<CommunityGroup>().Property(e => e.Id).HasDefaultValueSql("NEWSEQUENTIALID()");
+
+            // 4. Performance Filtered Indexes (Skip Soft-Deleted rows)
+            builder.Entity<UserEnrollment>().HasIndex(x => x.UserId).HasFilter("[IsDeleted] = 0");
+            builder.Entity<UserEnrollment>().HasIndex(x => x.RoadmapId).HasFilter("[IsDeleted] = 0");
+            builder.Entity<Experience>().HasIndex(x => x.UserProfileId).HasFilter("[IsDeleted] = 0");
+            builder.Entity<Education>().HasIndex(x => x.UserProfileId).HasFilter("[IsDeleted] = 0");
+            builder.Entity<Project>().HasIndex(x => x.UserProfileId).HasFilter("[IsDeleted] = 0");
+            builder.Entity<UserProfile>().HasIndex(x => x.UserId).HasFilter("[IsDeleted] = 0");
+            builder.Entity<UserNodeProgress>().HasIndex(x => x.UserId).HasFilter("[IsDeleted] = 0");
+            builder.Entity<UserNodeProgress>().HasIndex(x => x.RoadmapLevelId).HasFilter("[IsDeleted] = 0");
+
+            // 5. Enum Conversions
             builder.Entity<UserSkill>()
                 .Property(s => s.Type)
                 .HasConversion<string>();

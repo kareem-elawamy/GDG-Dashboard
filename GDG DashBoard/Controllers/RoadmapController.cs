@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace GDG_DashBoard.Controllers;
 
-[Authorize]
+[Authorize(Roles = "Admin,Organizer,Speaker")]
 public class RoadmapController : Controller
 {
     private readonly AppDbContext _context;
@@ -24,10 +24,19 @@ public class RoadmapController : Controller
 
     public async Task<IActionResult> Index()
     {
-        var roadmaps = await _context.Roadmaps
-            .Include(r => r.CreatedBy)
-            .Include(r => r.Levels)
-            .ToListAsync();
+        var user = await _userManager.GetUserAsync(User);
+        if (user == null) return Challenge();
+
+        IEnumerable<Roadmap> roadmaps;
+        if (await _userManager.IsInRoleAsync(user, "Admin") || await _userManager.IsInRoleAsync(user, "Organizer"))
+        {
+            roadmaps = await _roadmapService.GetAllRoadmapsAsync();
+        }
+        else
+        {
+            roadmaps = await _roadmapService.GetRoadmapsByCreatorAsync(user.Id);
+        }
+        
         return View(roadmaps);
     }
 

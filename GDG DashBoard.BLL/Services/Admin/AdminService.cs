@@ -19,7 +19,6 @@ public class AdminService : IAdminService
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly LinkGenerator _linkGenerator;
 
-    // ── Repository Injections (strict 3-tier — NO AppDbContext in BLL) ──────
     private readonly IGenericRepositoryAsync<UserProfile> _profileRepo;
     private readonly IGenericRepositoryAsync<UserEnrollment> _enrollmentRepo;
     private readonly IGenericRepositoryAsync<UserNodeProgress> _progressRepo;
@@ -47,9 +46,7 @@ public class AdminService : IAdminService
         _roadmapRepo = roadmapRepo;
     }
 
-    // ─────────────────────────────────────────────────────────────────────────
-    // 1. ONBOARD MEMBER
-    // ─────────────────────────────────────────────────────────────────────────
+   
     public async Task<AuthResultDto> OnboardMemberAsync(OnboardMemberDto dto)
     {
         if (!await _roleManager.RoleExistsAsync(dto.Role))

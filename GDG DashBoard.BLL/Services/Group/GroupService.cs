@@ -37,6 +37,24 @@ public class GroupService : IGroupService
         return await _context.Roadmaps.ToListAsync();
     }
 
+    public async Task<List<CommunityGroup>> GetAllGroupsAsync()
+    {
+        return await _context.CommunityGroups
+            .Include(g => g.Roadmap)
+            .Include(g => g.GroupMembers)
+            .ToListAsync();
+    }
+
+    public async Task<List<CommunityGroup>> GetOpenCohortsAsync(int count = 8)
+    {
+        return await _context.CommunityGroups
+            .Include(g => g.Roadmap)
+            .Include(g => g.GroupMembers)
+            .OrderByDescending(g => g.CreatedAt)
+            .Take(count)
+            .ToListAsync();
+    }
+
     public async Task<List<CommunityGroup>> GetGroupsForInstructorAsync(Guid instructorId)
     {
         return await _context.CommunityGroups

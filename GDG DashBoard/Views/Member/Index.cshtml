@@ -1,14 +1,128 @@
+@model GDG_DashBoard.BLL.Dtos.Member.MemberDashboardDto
+
 @{
     ViewData["Title"] = "Member Dashboard";
-    Layout = "_AdminLayout"; // Using the same layout for now
+    Layout = "_AdminLayout";
 }
 
-<div class="max-w-4xl mx-auto space-y-8 mt-8">
-    <div class="bg-white rounded-2xl border border-outline-variant shadow-sm p-8 text-center">
-        <span class="material-symbols-outlined text-6xl text-primary mb-4 block">groups</span>
-        <h1 class="text-3xl font-bold font-headline text-on-surface mb-2">Welcome to GDG Dashboard</h1>
-        <p class="text-on-surface/60 max-w-lg mx-auto">
-            You are logged in as a Member. This space will soon securely host your personal Roadmap progress, Profile settings, and Activity logs.
-        </p>
+<!-- Main Dashboard Container -->
+<div class="max-w-7xl mx-auto space-y-12 px-4 py-8 sm:px-6 lg:px-8">
+    
+    <!-- Success/Error Messages -->
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="p-4 rounded-xl bg-secondary/5 border border-secondary/30 flex items-center gap-3">
+            <span class="material-symbols-outlined text-secondary" style="font-variation-settings:'FILL' 1;">check_circle</span>
+            <p class="text-sm font-medium text-secondary">@TempData["SuccessMessage"]</p>
+        </div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="p-4 rounded-xl bg-error/5 border border-error/30 flex items-center gap-3">
+            <span class="material-symbols-outlined text-error">error</span>
+            <p class="text-sm font-medium text-error">@TempData["ErrorMessage"]</p>
+        </div>
+    }
+
+    <!-- ══ DASHBOARD WIDGETS (LEARNING & COHORTS) ══════════════════════════ -->
+    <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
+        <!-- Column 1: Join & Progress -->
+        <div class="space-y-6 lg:col-span-1">
+            <div class="p-6 bg-surface-container-lowest border border-outline-variant/20 shadow-sm rounded-3xl">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-sm font-bold text-on-surface/70">Profile Completeness</span>
+                    <span class="text-sm font-black text-primary">@Model.ProfileCompletenessPercentage%</span>
+                </div>
+                <div class="w-full h-3 bg-surface-container-highest rounded-full overflow-hidden">
+                    <div class="h-3 bg-primary rounded-full transition-all duration-1000" style="width: @Model.ProfileCompletenessPercentage%"></div>
+                </div>
+                <div class="mt-6">
+                    <a asp-controller="Member" asp-action="EditProfile" class="w-full px-4 py-3 bg-primary text-white rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-primary/90 transition-colors shadow-md">
+                        <span class="material-symbols-outlined text-sm">edit_document</span>
+                        Update CV & Profile
+                    </a>
+                </div>
+            </div>
+
+            <div class="p-6 bg-gradient-to-br from-primary/10 to-secondary/5 border border-primary/20 shadow-sm rounded-3xl">
+                <h3 class="font-headline font-bold text-lg text-on-surface mb-2">Join a Cohort 🚀</h3>
+                <p class="text-sm text-on-surface/60 mb-4">Have a Join Code from your instructor? Enter it below.</p>
+                <form asp-controller="Group" asp-action="JoinPost" method="post" class="space-y-3">
+                    <input type="text" name="code" id="code" placeholder="e.g. A1B2C3" required class="block w-full px-4 py-3 bg-surface-container-lowest border border-outline-variant/30 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary uppercase text-sm font-bold" />
+                    <button type="submit" class="w-full px-4 py-3 bg-on-surface text-surface rounded-xl font-bold hover:bg-on-surface/80 transition-colors shadow-md">
+                        Join Group
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Column 2: Active Roadmaps -->
+        <div class="lg:col-span-1">
+            <div class="p-6 bg-surface-container-lowest border border-outline-variant/20 shadow-sm rounded-3xl h-full">
+                <h3 class="font-headline font-bold text-xl mb-4">My Learning Tracks</h3>
+                @if (Model.ActiveRoadmaps.Any())
+                {
+                    <div class="space-y-4">
+                        @foreach (var roadmap in Model.ActiveRoadmaps)
+                        {
+                            <div class="p-4 border border-outline-variant/20 rounded-2xl bg-surface-container-low">
+                                <div class="flex items-center justify-between mb-2">
+                                    <h4 class="font-bold text-on-surface text-sm">@roadmap.Title</h4>
+                                    <span class="px-2 py-1 rounded-md text-[10px] font-black uppercase tracking-wider bg-secondary/10 text-secondary">@roadmap.Status</span>
+                                </div>
+                                <div class="flex items-center justify-between mb-1 mt-3">
+                                    <span class="text-xs font-bold text-on-surface/50">Progress</span>
+                                    <span class="text-xs font-black text-on-surface">@roadmap.ProgressPercentage%</span>
+                                </div>
+                                <div class="w-full h-1.5 bg-surface-container-highest rounded-full overflow-hidden">
+                                    <div class="h-full bg-secondary rounded-full" style="width: @roadmap.ProgressPercentage%"></div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <div class="py-8 text-center text-on-surface/40 flex flex-col items-center">
+                        <span class="material-symbols-outlined text-4xl mb-2">map</span>
+                        <p class="text-sm font-medium">Not enrolled in any Roadmaps.</p>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <!-- Column 3: Active Groups -->
+        <div class="lg:col-span-1">
+            <div class="p-6 bg-surface-container-lowest border border-outline-variant/20 shadow-sm rounded-3xl h-full">
+                <h3 class="font-headline font-bold text-xl mb-4">My Community Groups</h3>
+                @if (Model.ActiveGroups.Any())
+                {
+                    <div class="space-y-4">
+                        @foreach (var group in Model.ActiveGroups)
+                        {
+                            <div class="p-4 border border-outline-variant/20 rounded-2xl bg-surface-container-low">
+                                <h4 class="font-bold text-on-surface">@group.Name</h4>
+                                @if (!string.IsNullOrEmpty(group.RoadmapTitle))
+                                {
+                                    <p class="mt-1 text-xs text-on-surface/60"><span class="font-bold">Studying:</span> @group.RoadmapTitle</p>
+                                }
+                                <div class="mt-4">
+                                    <a asp-controller="Group" asp-action="Details" asp-route-id="@group.GroupId" class="text-xs font-bold text-primary hover:underline flex items-center gap-1">
+                                        View Cohort <span class="material-symbols-outlined text-[14px]">arrow_forward</span>
+                                    </a>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <div class="py-8 text-center text-on-surface/40 flex flex-col items-center">
+                        <span class="material-symbols-outlined text-4xl mb-2">groups</span>
+                        <p class="text-sm font-medium">No active groups.</p>
+                    </div>
+                }
+            </div>
+        </div>
     </div>
 </div>
