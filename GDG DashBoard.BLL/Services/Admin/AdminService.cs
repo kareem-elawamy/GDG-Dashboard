@@ -112,7 +112,9 @@ public class AdminService : IAdminService
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"[EMAIL ERROR] {ex.Message}");
+            var innerMsg = ex.InnerException?.Message;
+            var fullError = innerMsg != null ? $"{ex.Message} → {innerMsg}" : ex.Message;
+            return AuthResultDto.Fail($"User created but email failed: {fullError}");
         }
 
         return new AuthResultDto
@@ -376,9 +378,11 @@ public class AdminService : IAdminService
             await _emailService.SendEmailAsync(user.Email!, "GDG Dashboard - New Setup Link", emailBody);
             return true;
         }
-        catch (Exception)
+        catch (Exception ex)
         {
-            return false;
+            var innerMsg = ex.InnerException?.Message;
+            var fullError = innerMsg != null ? $"{ex.Message} → {innerMsg}" : ex.Message;
+            throw new InvalidOperationException($"SMTP Error: {fullError}", ex);
         }
     }
 }

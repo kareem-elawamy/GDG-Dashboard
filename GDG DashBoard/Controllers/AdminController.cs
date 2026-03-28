@@ -113,12 +113,18 @@ public class AdminController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> ResendActivationToken(Guid id)
     {
-        var success = await _adminService.ResendActivationTokenAsync(id);
-
-        if (success)
-            TempData["SuccessMessage"] = "Setup link sent successfully!";
-        else
-            TempData["ErrorMessage"] = "Failed to send setup link. Check SMTP settings or user existence.";
+        try
+        {
+            var success = await _adminService.ResendActivationTokenAsync(id);
+            if (success)
+                TempData["SuccessMessage"] = "Setup link sent successfully!";
+            else
+                TempData["ErrorMessage"] = "User not found.";
+        }
+        catch (Exception ex)
+        {
+            TempData["ErrorMessage"] = $"Email failed: {ex.Message}";
+        }
 
         return RedirectToAction(nameof(AllMembers));
     }
